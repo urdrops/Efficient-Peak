@@ -3,7 +3,6 @@ import threading
 import time
 import psutil
 
-# Переменные для хранения статистики
 total_keypresses = 0
 
 total_scroll_pixels = 0
@@ -12,25 +11,21 @@ average_scroll_speed = 0
 left_clicks = 0
 right_clicks = 0
 
-# Переменные для отслеживания скорости скроллинга
 scroll_start_time = 0
 scroll_end_time = 0
 scroll_distance = 0
 
-# Переменные для отслеживания сетевого трафика
 network_start_time = time.time()
 received_bytes = 0
 sent_bytes = 0
 
 
-# Функция обработки нажатия клавиши
 def on_key_press(key):
-    global total_keypresses, ctrl_keypresses, alt_keypresses, shift_keypresses
+    global total_keypresses
 
     total_keypresses += 1
 
 
-# Функция обработки скроллинга мыши
 def on_scroll(x, y, dx, dy):
     global total_scroll_pixels, average_scroll_speed, scroll_start_time, scroll_end_time, scroll_distance
 
@@ -44,7 +39,6 @@ def on_scroll(x, y, dx, dy):
         scroll_distance += abs(dy)
 
 
-# Функция обработки кликов мыши
 def on_click(x, y, button, pressed):
     global left_clicks, right_clicks
 
@@ -55,31 +49,24 @@ def on_click(x, y, button, pressed):
             right_clicks += 1
 
 
-# Функция для отслеживания сетевого трафика
-# Функция для отслеживания сетевого трафика
 def track_network_traffic():
     global network_start_time, received_bytes, sent_bytes
 
     while True:
-        start_time = time.time()
 
-        # Получение данных о сетевом трафике
         start_received_bytes = psutil.net_io_counters().bytes_recv
         start_sent_bytes = psutil.net_io_counters().bytes_sent
 
-        time.sleep(120)  # Периодичность проверки сетевого трафика
+        time.sleep(60)
 
         end_time = time.time()
 
-        # Получение данных о сетевом трафике после интервала
         end_received_bytes = psutil.net_io_counters().bytes_recv
         end_sent_bytes = psutil.net_io_counters().bytes_sent
 
-        # Разница между начальным и конечным трафиком
         interval_received_bytes = end_received_bytes - start_received_bytes
         interval_sent_bytes = end_sent_bytes - start_sent_bytes
 
-        # Переводим байты в мегабайты
         interval_received_mb = round(interval_received_bytes / (1024 * 1024), 5)
         interval_sent_mb = round(interval_sent_bytes / (1024 * 1024), 5)
 
@@ -90,16 +77,12 @@ def track_network_traffic():
         network_start_time = end_time
 
 
-# ... (остальной код остается без изменений)
-
-
-# Функция для вывода статистики и сброса данных
 def print_statistics():
     global total_keypresses
     global total_scroll_pixels, average_scroll_speed, scroll_start_time, scroll_end_time, scroll_distance
     global left_clicks, right_clicks
 
-    average_keypresses = total_keypresses / 2.0  # среднее количество кликов в секунду
+    average_keypresses = total_keypresses / 2.0
 
     if scroll_start_time != 0 and scroll_end_time != 0:
         time_difference = scroll_end_time - scroll_start_time
@@ -115,33 +98,27 @@ def print_statistics():
 
     # Сброс данных
     total_keypresses = 0
-
     total_scroll_pixels = 0
     average_scroll_speed = 0
     scroll_start_time = 0
     scroll_end_time = 0
     scroll_distance = 0
-
     left_clicks = 0
     right_clicks = 0
 
 
-# Функция для выполнения каждые 2 минуты
 def timer():
     print_statistics()
-    threading.Timer(120, timer).start()
+    threading.Timer(60, timer).start()
 
 
-# Запуск таймера
 timer()
 
-# Запуск функции отслеживания сетевого трафика в отдельном потоке
 network_thread = threading.Thread(target=track_network_traffic)
 network_thread.start()
 
-# Настройка слушателя клавиатуры
+
 with keyboard.Listener(on_press=on_key_press) as key_listener:
-    # Настройка слушателя мыши
     with mouse.Listener(on_scroll=on_scroll, on_click=on_click) as mouse_listener:
         key_listener.join()
         mouse_listener.join()
