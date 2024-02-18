@@ -9,7 +9,7 @@ Efficient Peak is a project focused on detecting attention loss and loss of focu
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/efficient-peak.git
+git clone https://github.com/urdrops/efficient-peak.git
 cd efficient-peak
 ```
 
