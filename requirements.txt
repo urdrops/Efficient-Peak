@@ -1,0 +1,4 @@
+pynput~=1.7.6
+PyGetWindow~=0.0.9
+ewmh~=0.1.6
+psutil~=5.9.8
